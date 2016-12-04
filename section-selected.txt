@@ -1,0 +1,174 @@
+Expert System
+
+Write a set of rules, part of a "building maintenance" ES, that would be able to answer the question: "Why did the lights just go out in POST 303D"? Break the problem down into subgoals, data-gathering, etc.
+
+Expert System for lights-go-out exercise
+
+Facts:
+
+    old:            the lightbulbs are more than one year old
+    in danger:      the lightbulbs are in danger of burning out
+    sounds:         the lightbulbs make rattling sounds when you shake them
+    M-F:            it is Monday to Friday
+    burnt:          the lightbulbs are burned out
+    workday:        it is a workday
+    before 5:       it is before 5:00 pm
+    power's out:    the power is out in POST
+    available:      the electrician is available
+
+Rules:
+
+    IF the lightbulbs are more than one year old
+    THEN the lightbulbs are in danger of burning out
+
+    IF NOT the lightbulbs are more than one year old
+    THEN NOT the lightbulbs are in danger of burning out
+    
+    IF the lightbulbs are in danger of burning out
+    AND IF the lightbulbs make rattling sounds when you shake them
+    THEN the lightbulbs are burned out
+
+    IF NOT the lightbulbs are in danger of burning out
+    THEN NOT the lightbulbs are burned out
+
+    IF NOT the lightbulbs make rattling sounds when you shake them
+    THEN NOT the lightbulbs are burned out
+
+    IF the lightbulbs are burned out
+    THEN the lights went out because the lightbulbs burned out (R1)
+
+    IF NOT the lightbulbs are burned out
+    THEN the power is out in POST
+
+    IF the power is out in POST
+    AND IF NOT the electrician is available
+    THEN the lights went out because the power was out and the electrician was not on duty (R2)
+
+    IF the power is out in POST
+    AND IF the electrician is available
+    THEN the lights went out because the power was out and the electrician was not skilled (R3)
+
+    IF it is a workday
+    AND IF it is before 5:00 pm
+    THEN the electrician is available
+
+    IF NOT it is a workday
+    THEN NOT the electrician is available
+
+    AND IF NOT it is before 5:00 pm
+    THEN NOT the electrician is available
+
+    IF it is Monday to Friday
+    THEN it is a workday
+
+    IF NOT it is Monday to Friday
+    THEN NOT it is a workday
+
+Conclusions:
+
+    R1:     the lights went out because the lightbulbs burned out
+    R2:     the lights went out because the power was out and the electrician was not on duty 
+    R3:     the lights went out because the power was out and the electrician was not skilled
+
+Consulting Example:
+
+    Are the lightbulbs more than one year old?                      Yes
+    Do the lightbulbs make rattling sounds when you shake them?     No
+    Is it Monday to Friday?                                         Yes
+    Is it before 5:00 pm?                                           Yes
+
+Expert System for lights-go-out exercise
+
+Consulting Conclusion: The lights went out because the power was out and the electrician was not skilled
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+Facts collected from data gathering:
+
+    old:            the lightbulbs are more than one year old                   {cf 0.2}
+    sounds:         the lightbulbs make rattling sounds when you shake them     {cf -0.8}
+    M-F:            it is Monday to Friday                                      {cf 1}
+    before 5:       it is before 5:00 pm                                        {cf 0.8}
+
+Rules:
+
+    IF the lightbulbs are more than one year old                                {cf 0.8}
+    THEN the lightbulbs are in danger of burning out
+
+    IF NOT the lightbulbs are more than one year old                            {cf 0.8}
+    THEN NOT the lightbulbs are in danger of burning out
+    
+    IF the lightbulbs are in danger of burning out                              {cf 0.9}
+    AND IF the lightbulbs make rattling sounds when you shake them
+    THEN the lightbulbs are burned out
+
+    IF NOT the lightbulbs are in danger of burning out                          {cf 0.7}
+    THEN NOT the lightbulbs are burned out
+
+    IF NOT the lightbulbs make rattling sounds when you shake them              {cf 0.9}
+    THEN NOT the lightbulbs are burned out
+
+    IF the lightbulbs are burned out                                            {cf 1}
+    THEN the lights went out because the lightbulbs burned out (R1)
+
+    IF NOT the lightbulbs are burned out                                        {cf 0.8}
+    THEN the power is out in POST
+
+    IF the power is out in POST                                                 {cf 0.9}
+    AND IF NOT the electrician is available
+    THEN the lights went out because the power was out and the electrician was not on duty (R2)
+
+    IF the power is out in POST                                                 {cf 0.8}
+    AND IF the electrician is available
+    THEN the lights went out because the power was out and the electrician was not skilled (R3)
+
+    IF it is a workday                                                          {cf 0.9}
+    AND IF it is before 5:00 pm
+    THEN the electrician is available
+
+    IF NOT it is a workday                                                      {cf 1}
+    THEN NOT the electrician is available
+
+    AND IF NOT it is before 5:00 pm                                             {cf 1}
+    THEN NOT the electrician is available
+
+    IF it is Monday to Friday                                                   {cf 1}
+    THEN it is a workday
+
+    IF NOT it is Monday to Friday                                               {cf 1}
+    THEN NOT it is a workday
+
+Example interpretations of the given CFs
+
+    Q: Was it before 5:00 pm when the lights went off in POST 303D?
+    A: I didn't look at my watch, but I'm pretty positive that it was before 5:00 pm.
+    ⇒  it is before 5:00 pm    {cf 0.8}
+
+    Q: Were those lightbulbs more than one year old?
+    A: Not sure.  It's possible.
+    ⇒  the lightbulbs are more than one year old    {cf 0.2}
+
+The forward chaining data-flow diagram for this system is illustrated as below.
+
+Expert System for lights-go-out exercise with given CFs
+
+With these given CFs and the ones collected from the data gathering process, we can calculate the CFs of the rest of the events in this ES.
+
+    in danger:          {cf 0.16  = 0.2 × 0.8}
+    NOT in danger:      {cf -0.16 = -0.2 × 0.8}
+    burnt:              {cf -0.72 = min[0.16, -0.8] × 0.9 }
+    NOT burnt:          {cf 0.685  = (0.8 × 0.9 + (-0.16) × 0.7) / (1 - min[|0.8 × 0.9|, |(-0.16) × 0.7|])}
+    power's out:        {cf 0.545 = 0.685 × 0.8}
+    workday:            {cf 1     = 1 × 1}
+    NOT workday:        {cf 1     = -1 × 1}
+    available:          {cf 0.72  = min[1, 0.8] × 0.9}
+    NOT available:      {cf -1    = -1 × 1}
+
+    R1:                 {cf -0.72 = -0.72 × 1}
+    R2:                 {cf -0.9  = min[0.545, -1] × 0.9}
+    R3:                 {cf 0.438 = min[0.545, 0.72] × 0.8}
+
+Expert System for lights-go-out exercise with calculated CFs
+
+In summary, with the given set of certainty factors, we are able the derive the certainty levels of different possible conclusions. Specifically, R2 with CF -0.9 is the most unlikely reason in the lights-out scenario, while R3 with CF 0.438 is the most likely reason.
